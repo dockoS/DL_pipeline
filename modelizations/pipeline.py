@@ -74,33 +74,60 @@ class MLpipeline():
 
         return model
     def GenereDenseNetModels(self):
-        list_growth_rate=[16,32]
+        list_growth_rate=[16,32,48]
         list_models={"densenet_121":[6,12,24,16],"densnet_169":[6,12,32,32],"densenet_201":[6,12,48,32],"densenet_26":[6,12,64,48]}
 
         for model_name in list_models.keys():
             for k in list_growth_rate:
                 model=self.DenseNet(k,list_models[model_name])
                 self.models[f"{model_name}_{k}"]=model
+                
+    def alexnetModel(self):
+        model = keras.models.Sequential([
+                        keras.layers.Conv2D(filters=96, kernel_size=(11,11), strides=(4,4), activation='relu', input_shape=self.input_shape),
+                        keras.layers.BatchNormalization(),
+                        keras.layers.MaxPool2D(pool_size=(3,3), strides=(2,2)),
+                        keras.layers.Conv2D(filters=256, kernel_size=(5,5), strides=(1,1), activation='relu', padding="same"),
+                        keras.layers.BatchNormalization(),
+                        keras.layers.MaxPool2D(pool_size=(3,3), strides=(2,2)),
+                        keras.layers.Conv2D(filters=384, kernel_size=(3,3), strides=(1,1), activation='relu', padding="same"),
+                        keras.layers.BatchNormalization(),
+                        keras.layers.Conv2D(filters=384, kernel_size=(3,3), strides=(1,1), activation='relu', padding="same"),
+                        keras.layers.BatchNormalization(),
+                        keras.layers.Conv2D(filters=256, kernel_size=(3,3), strides=(1,1), activation='relu', padding="same"),
+                        keras.layers.BatchNormalization(),
+                        keras.layers.MaxPool2D(pool_size=(3,3), strides=(2,2)),
+                        keras.layers.Flatten(),
+                        keras.layers.Dense(4096, activation='relu'),
+                        keras.layers.Dropout(0.5),
+                        keras.layers.Dense(4096, activation='relu'),
+                        keras.layers.Dropout(0.5),
+                        keras.layers.Dense(self.n_classes, activation='softmax')
+                    ])
+        self.models["alexnet"]=model
+        return model
     def GenererPretrainedModel(self):
         input=Input(self.input_shape)
-        models={"vgg19":pretrained_model.vgg19.VGG19(
+        models={
+            
+            "vgg19":pretrained_model.vgg19.VGG19(
             include_top=False,
             input_shape=self.input_shape,
             input_tensor=input
         )
-        # ,
-        # "vgg16":pretrained_model.vgg16.VGG16(
-        #     include_top=False,
-        #     input_shape=self.input_shape 
-        # ),
-        # "inception_v3":pretrained_model.inception_v3.InceptionV3(
-        #     include_top=False,
-        #     input_shape=self.input_shape 
-        # ),
-        # "resnet50":pretrained_model.resnet50.ResNet50(
-        #     include_top=False,
-        #     input_shape=self.input_shape 
-        # )
+        ,
+        "vgg16":pretrained_model.vgg16.VGG16(
+            include_top=False,
+            input_shape=self.input_shape 
+        ),
+        "inception_v3":pretrained_model.inception_v3.InceptionV3(
+            include_top=False,
+            input_shape=self.input_shape 
+        ),
+        "resnet50":pretrained_model.resnet50.ResNet50(
+            include_top=False,
+            input_shape=self.input_shape 
+        )
              }
         for model in models.keys():
             x=models[model].output
@@ -137,8 +164,8 @@ class MLpipeline():
         
     def train_with_generator(self,epochs=1,batch_size=32,lr=0.001):
         logger.success(self.input_shape)
-        train_generator=data_generator(self.input_shape[0],self.path_data+"/_train",batch_size)
-        validation_generator=data_generator(self.input_shape[0],self.path_data+"/_val",batch_size)
+        train_generator=data_generator(self.input_shape[0],self.path_data+"/train",batch_size)
+        validation_generator=data_generator(self.input_shape[0],self.path_data+"/val",batch_size)
         classes_weight=class_weight.compute_class_weight(class_weight='balanced',classes=np.unique(train_generator.classes),y=train_generator.classes)
         classes_weight=dict(enumerate(classes_weight))
         with open(self.path_hyperparameters) as f:
@@ -172,7 +199,7 @@ def predict(height,width,nbr_channels,output,activation,path_data,path_hyperpara
     print(nbr_channels)
     pipeline=MLpipeline((height,width,nbr_channels),output,activation,path_data,path_hyperparameters)
     dense_nets=pipeline.GenereDenseNetModels()
-    #logger.success(dense_nets)
+    pipeline.
     pipeline.train_with_generator()
 
 if __name__ == '__main__':

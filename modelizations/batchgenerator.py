@@ -74,7 +74,7 @@ def schedule(epoch,lr):
 def callback(name_path,id):
     
     return [keras.callbacks.EarlyStopping(monitor='val_loss',patience=10),
-                  keras.callbacks.ModelCheckpoint(filepath=f"/Users/mac/Desktop/search/deeplearnigComputerVision/Stage/OCT-Glaucome/code/MLpipeline/backup_training/models/{name_path}_{id}.h5",monitor='val_acc',save_best_only=True),
+                  keras.callbacks.ModelCheckpoint(filepath=f"/Users/mac/Desktop/search/deeplearnigComputerVision/Stage/OCT-Glaucome/code/MLpipeline/DL_pipeline/backup_training/models/{name_path}_{id}.h5",monitor='val_acc',save_best_only=True),
                   keras.callbacks.LearningRateScheduler(schedule,verbose=0),
                   ]
     
@@ -102,13 +102,13 @@ def generer_metadata_file(path,history):
     epochs=range(1,len(loss_values)+1)
     history_dict["epoch"]=epochs
 
-    pd.DataFrame.from_dict(history_dict).to_csv(f"/Users/mac/Desktop/search/deeplearnigComputerVision/Stage/OCT-Glaucome/code/MLpipeline/backup_training/metadata/{path}.csv")
+    pd.DataFrame.from_dict(history_dict).to_csv(f"/Users/mac/Desktop/search/deeplearnigComputerVision/Stage/OCT-Glaucome/code/MLpipeline/DL_pipeline/backup_training/metadata/{path}.csv")
     logger.success("meta data of the Model successfully save")
 
 def number_parameters_file(path,models):
     def get_number_params(model):
         return model.count_params()
-    pd.DataFrame.from_dict({"model":models.keys(),"parameters":map(get_number_params,models.values())}).to_csv(f"/Users/mac/Desktop/search/deeplearnigComputerVision/Stage/OCT-Glaucome/code/MLpipeline/backup_training/metadata/{path}.csv")
+    pd.DataFrame.from_dict({"model":models.keys(),"parameters":map(get_number_params,models.values())}).to_csv(f"/Users/mac/Desktop/search/deeplearnigComputerVision/Stage/OCT-Glaucome/code/MLpipeline/DL_pipeline/backup_training/metadata/{path}.csv")
     logger.success("number-parameters saved")
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import numpy as np
