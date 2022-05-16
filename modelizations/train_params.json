@@ -1,0 +1,26 @@
+{
+"hyperparameters":[
+    {
+        "id":1,
+
+        "optimizer":"adam"
+
+    },
+    {
+        "id":2,
+        "optimizer":"sgd"
+  
+
+    },
+    {
+        "id":3,
+        "optimizer":"rmsprop"
+    },
+    {
+        "id":4,
+        "optimizer":"adagrad"
+
+    }
+
+]
+}
